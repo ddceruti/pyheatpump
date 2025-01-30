@@ -19,9 +19,9 @@ Requires pytest:
 
 `pip install .[testing]`
 
-Then, run the test in `./test`
+Then, run the tests in `./test`
 
-`pytest test`
+`pytest test/installation.py test/cops.py`
 
 ## Documentation
 

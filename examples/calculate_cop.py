@@ -4,13 +4,15 @@ from pyheatpump import cop
 
 
 if __name__ == "__main__":
-    delta_T = 20
-    T_sink_out = 40
-    print(f"Temperature of the heat sink outlet: {T_sink_out} deg. C")
-    print(f"Temperature difference: {delta_T} K")
+    source_temperature = 20
+    sink_temperature = 60
+    delta = sink_temperature - source_temperature
+    print(f"Temperature of the heat sink outlet: {sink_temperature} deg. C")
+    print(f"Temperature difference: {delta} K")
     
-    cop.calculate(delta_T, T_sink_out)
-    print(f"Conventional heat pump efficiency: {cop.calculate(delta_T, T_sink_out):.2f}")
+    conv = cop.calculate(source_temperature=source_temperature,
+                         sink_temperature=sink_temperature)
+    print(f"Conventional heat pump efficiency: {conv:.2f}")
 
-    carnot = cop.carnot(delta_T, T_sink_out + 273.15, quality_factor=1)
+    carnot = cop.carnot(delta, sink_temperature + 273.15, quality_factor=1)
     print(f"Carnot efficiency: {carnot:.2f}")

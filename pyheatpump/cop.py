@@ -161,26 +161,23 @@ def calculate(source_temperature: float,
                     raise ValueError(f"The key {k} is missing in the parameters dict.")
 
     hp = classify_hp(sink_temperature, parameters)
-    if hp is None:
-        warnings.warn(f"The heat pump with sink temperature {sink_temperature} °C could not be classified. The COP will be calculated with a Carnot model.")
-
     T = sink_temperature + 273.15  # °C to K
     delta = sink_temperature - source_temperature
 
-    p = parameters[hp]
     if hp == "conventional":
-        cop = jesper_conventional(delta, T, p)
+        cop = jesper_conventional(delta, T, parameters[hp])
         if 10 > delta > 78:
             warnings.warn(f"The temperature difference {delta} is outside the range of the model [10, 78] K.")
         if -10 > source_temperature > 60:
-            warnings.warn(f"The temperature of the source {source_temperature} is outside the range of the model [25, 110] K.")    
+            warnings.warn(f"The temperature of the source {source_temperature} is outside the range of the model [25, 110] K.")
     elif hp == "very high temperature":
-        cop = jesper_very_high(delta, T, p)
+        cop = jesper_very_high(delta, T, parameters[hp])
         if 25 > delta > 95:
             warnings.warn(f"The temperature difference {delta} is outside the range of the model [10, 78] K.")
         if 25.1 > source_temperature > 110.1:
             warnings.warn(f"The temperature of the source {source_temperature} is outside the range of the model [25, 110] K.")
     else:
         cop = carnot(delta, T)
+        warnings.warn(f"The heat pump with sink temperature {sink_temperature} °C could not be classified. The COP will be calculated with a Carnot model.")
 
     return cop

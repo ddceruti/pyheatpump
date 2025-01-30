@@ -25,8 +25,10 @@ Then, run the test in `./test`
 
 ## Documentation
 
-Docs with sphinx:
+Docs can be compiled with sphinx:
 
 `pip install .[docs]`
 
 Then build them:
+
+`sphinx-build -b html ./docs/source build`

@@ -14,6 +14,7 @@ The model is based on the following paper:
 """
 
 import warnings
+from typing import Union
 
 __author__ = "Amedeo Ceruti"
 
@@ -40,24 +41,18 @@ HP_PARAMETERS = {
 
 
 def classify_hp(T_sink_out: float,
-                parameters: dict) -> str:
+                parameters: Union[dict, None] = None) -> str:
     """
-    Classify the heat pump based on the sink temperature (delivered
-    temperature).
+    Classify the heat pump based on the sink temperature (delivered temperature).
 
-    Parameters
-    ----------
-    T_sink_out : float
-        Outlet temperature of the sink.
-    parameters : dict
-        Parameters of the heat pump model. Default is None, in which case
-        the default, hardcoded parameters are used.
-    
-    Returns
-    -------
-    _type : str
-        Type of heat pump based on the sink (either "conventional",
-        "very high temperature" or None if the conditions are not met).
+    Args:
+        T_sink_out (float): Outlet temperature of the sink.
+        parameters (dict): Parameters of the heat pump model. Default is None, in which case
+            the default, hardcoded parameters are used.
+
+    Returns:
+        str: Type of heat pump based on the sink (either "conventional",
+            "very high temperature" or None if the conditions are not met).
     """
     _type = None
     for key, values in parameters.items():
@@ -73,19 +68,18 @@ def jesper_conventional(delta_T: float,
                         parameters: dict = None) -> float:
     """Conventional heat pump model according to Jesper et al.
 
-    Parameters
-    ----------
-    Delta_T : float
-        Temperature difference between heat source and sink.
-    T_sink_out : float
-        Outlet temperature of the sink.
-    parameters : dict
-        Parameters of the heat pump model.
+    Args:
+        Delta_T (float): Temperature difference between heat source and sink.
+        T_sink_out (float): Outlet temperature of the sink.
+        parameters (dict): Parameters of the heat pump model.
 
-    Returns
-    -------
-    COP : float
-        Coefficient of performance of the heat pump.
+    Returns:
+        float: Coefficient of performance of the conventional heat pump.
+
+    The model is defined as:
+
+    .. math::
+        COP = a \cdot (\Delta T + 2b)^c \cdot (T_{sink} + b)^d
     """
     term1 = parameters["a"]*(delta_T + 2*parameters["b"])**parameters["c"]
     term2 = (T_sink_out + parameters["b"])**parameters["d"]
@@ -97,19 +91,18 @@ def jesper_very_high(delta_T: float,
                      parameters: dict) -> float:
     """Calculate the very high temperature heat pump efficiency.
 
-    Parameters
-    ----------
-    delta_T : float
-        Temperature difference between heat source and heat sink [K].
-    T_sink_out : float
-        Temperature of the heat sink outlet [°C].
-    parameters : dict
-        Dictionary containing the parameters of the heat pump.
+    Args:
+        delta_T (float): Temperature difference between heat source and heat sink [K].
+        T_sink_out (float): Temperature of the heat sink outlet [°C].
+        parameters (dict): Dictionary containing the parameters of the heat pump.
 
-    Returns
-    -------
-    COP : float
-        Coefficient of performance of the heat pump.
+    Returns:
+        float: Coefficient of performance of the high temperature heat pump.
+
+    The model is defined as:
+
+    .. math::
+        COP = a \cdot (\Delta T + 2d)^b \cdot (T_{sink} + d)^c
     """
     term1 = parameters["a"]*(delta_T + 2*parameters["d"])**parameters["b"]
     term2 = (T_sink_out + parameters["d"])**parameters["c"]
@@ -121,45 +114,37 @@ def carnot(delta_T: float,
            quality_factor: float = 0.4) -> float:
     """Calculate the Carnot efficiency of the heat pump.
 
-    Parameters
-    ----------
-    delta_T : float
-        Temperature difference between heat source and heat sink [K].
-    T_sink_out : float
-        Temperature of the heat sink outlet [°C].
-    quality_factor : float
-        Quality factor of the heat pump. Default is 0.4.
+    Args:
+        delta_T (float): Temperature difference between heat source and heat sink [K].
+        T_sink_out (float): Temperature of the heat sink outlet [°C].
+        quality_factor (float): Quality factor of the heat pump. Default is 0.4.
 
-    Returns
-    -------
-    COP : float
-        Coefficient of performance of the heat pump.
+    Returns:
+        float: Coefficient of performance of the heat pump.
+    
+    The model is defined as:
+
+    .. math::
+        COP = \text{quality_factor} \cdot \frac{T_{sink}}{\Delta T}
     """
-    T = T_sink_out + 273.15
-    return quality_factor*(T/(delta_T + T))
+    return quality_factor*(T_sink_out/delta_T)
 
 
-def calculate(T_source: float,
-              T_sink: float,
+def calculate(source_temperature: float,
+              sink_temperature: float,
               parameters: dict = None) -> float:
     """Main calculation function for the COP of large scale heat pumps.
+
     Classifies the HP into a type and then calculates the COP with a regression
     or a Carnot model depending on the boundary conditions.
 
-    Parameters
-    ----------
-    delta_T : float
-        Temperature difference between the heat source and the heat sink in K.
-    T_sink_out : float
-        Temperature of the heat sink output in °C.
-    parameters : dict
-        Dictionary of parameters for the model (see the default parameters,
-        HP_PARAMETERS).
+    Args:
+        source_temperature (float): Temperature of the heat source in °C.
+        sink_temperature (float): Temperature of the heat sink output in °C.
+        parameters (dict): Dictionary of parameters for the model (see the default parameters, HP_PARAMETERS).
 
-    Returns
-    -------
-    cop : float
-        Coefficient of performance of the heat pump.
+    Returns:
+        float: Coefficient of performance of the heat pump.
     """
     if parameters is None:
         parameters = HP_PARAMETERS
@@ -172,27 +157,27 @@ def calculate(T_source: float,
                 if k not in parameters[key]:
                     raise ValueError(f"The key {k} is missing in the parameters dict.")
 
-    hp = classify_hp(T_sink, parameters)
+    hp = classify_hp(sink_temperature, parameters)
     if hp is None:
-        warnings.warn(f"The heat pump with sink temperature {T_sink} °C could not be classified. The COP will be calculated with a Carnot model.")
+        warnings.warn(f"The heat pump with sink temperature {sink_temperature} °C could not be classified. The COP will be calculated with a Carnot model.")
 
-    T = T_sink + 273.15  # °C to K
-    delta_T = T_sink - T_source
+    T = sink_temperature + 273.15  # °C to K
+    delta = sink_temperature - source_temperature
 
     p = parameters[hp]
     if hp == "conventional":
-        cop = jesper_conventional(delta_T, T, p)
-        if 10 > delta_T > 78:
-            warnings.warn(f"The temperature difference {delta_T} is outside the range of the model [10, 78] K.")
-        if -10 > T_source > 60:
-            warnings.warn(f"The temperature of the source {T_source} is outside the range of the model [25, 110] K.")    
+        cop = jesper_conventional(delta, T, p)
+        if 10 > delta > 78:
+            warnings.warn(f"The temperature difference {delta} is outside the range of the model [10, 78] K.")
+        if -10 > source_temperature > 60:
+            warnings.warn(f"The temperature of the source {source_temperature} is outside the range of the model [25, 110] K.")    
     elif hp == "very high temperature":
-        cop = jesper_very_high(delta_T, T, p)
-        if 25 > delta_T > 95:
-            warnings.warn(f"The temperature difference {delta_T} is outside the range of the model [10, 78] K.")
-        if 25.1 > T_source > 110.1:
-            warnings.warn(f"The temperature of the source {T_source} is outside the range of the model [25, 110] K.")
+        cop = jesper_very_high(delta, T, p)
+        if 25 > delta > 95:
+            warnings.warn(f"The temperature difference {delta} is outside the range of the model [10, 78] K.")
+        if 25.1 > source_temperature > 110.1:
+            warnings.warn(f"The temperature of the source {source_temperature} is outside the range of the model [25, 110] K.")
     else:
-        cop = carnot(delta_T, T)
+        cop = carnot(delta, T)
 
     return cop

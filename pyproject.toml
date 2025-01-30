@@ -22,8 +22,5 @@ classifiers = [
 testing = ["pytest"]
 docs = ["sphinx", "sphinx-rtd-theme"]
 
-[tool.setuptools]
-packages = ["find:"]
-
 [tool.setuptools.packages.find]
 where = ["hp"]

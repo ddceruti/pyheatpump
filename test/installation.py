@@ -1,2 +1,2 @@
 def test_import():
-    import hp
+    import pyheatpump

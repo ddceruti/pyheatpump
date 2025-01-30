@@ -1,11 +1,11 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "large-scale-heat-pump"
+name = "pyheatpump"
 version = "0.1.0"
-description = "Modeling large-scale heat pumps"
+description = "Modeling large-scale and high temperature heat pumps"
 authors = [
     { name="Amedeo Ceruti", email="amedeo.ceruti@tum.de" }
 ]
@@ -20,7 +20,4 @@ classifiers = [
 
 [project.optional-dependencies]
 testing = ["pytest"]
-docs = ["sphinx", "sphinx-rtd-theme"]
-
-[tool.setuptools.packages.find]
-where = ["hp"]
+docs = ["sphinx", "sphinx-rtd-theme", "myst_parser", "sphinxcontrib-programoutput"]

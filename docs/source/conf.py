@@ -5,8 +5,22 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+import os
+import sys
+import shutil
 
-project = 'Large Scale Heat Pump Modeling in Python'
+sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(0, os.path.abspath('../../examples'))
+
+# Copy README.md to docs/source
+src = os.path.abspath('../../README.md')
+dest = os.path.abspath('./README.md')
+if os.path.exists(src) and not os.path.exists(dest):
+    shutil.copyfile(src, dest)
+
+
+# -- Project information -----------------------------------------------------
+project = 'pyheatpump'
 copyright = '2025, Amedeo Ceruti'
 author = 'Amedeo Ceruti'
 release = '0.1.0'
@@ -19,6 +33,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'myst_parser',
+    'sphinx.ext.mathjax',
+    'sphinxcontrib.programoutput',
 ]
 
 templates_path = ['_templates']

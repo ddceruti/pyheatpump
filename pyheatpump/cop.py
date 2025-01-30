@@ -116,7 +116,7 @@ def carnot(delta_T: float,
 
     Args:
         delta_T (float): Temperature difference between heat source and heat sink [K].
-        T_sink_out (float): Temperature of the heat sink outlet [°C].
+        T_sink_out (float): Temperature of the heat sink outlet [K].
         quality_factor (float): Quality factor of the heat pump. Default is 0.4.
 
     Returns:
@@ -125,9 +125,12 @@ def carnot(delta_T: float,
     The model is defined as:
 
     .. math::
-        COP = \text{quality_factor} \cdot \frac{T_{sink}}{\Delta T}
+
+        COP = quality_factor \cdot T_{sink} / \Delta T
+    
     """
-    return quality_factor*(T_sink_out/delta_T)
+    cop = quality_factor*(T_sink_out/delta_T)
+    return cop
 
 
 def calculate(source_temperature: float,

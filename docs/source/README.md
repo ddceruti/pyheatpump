@@ -31,7 +31,7 @@ Docs can be compiled with sphinx:
 
 Generate the api doc of the modules in `./pyheatpump`
 
-`sphinx-apidoc -o docs/source/modules pyheatpump`
+`sphinx-apidoc -o docs/source pyheatpump`
 
 Then build them:
 

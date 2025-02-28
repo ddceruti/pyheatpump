@@ -7,11 +7,11 @@ Calculate COP
 Python code:
 ^^^^^^^^^^^^
 
-.. literalinclude:: ../../examples/calculate_cop.py
+.. literalinclude:: ../../examples/geothermal_heatpump.py
    :language: python
-   :caption: calculate_cop.py
+   :caption: geothermal_heatpump.py
 
 Output:
 ^^^^^^^
 
-.. program-output:: python ../../examples/calculate_cop.py
+.. program-output:: python ../../examples/geothermal_heatpump.py

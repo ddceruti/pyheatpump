@@ -29,9 +29,9 @@ Docs can be compiled with sphinx:
 
 `pip install .[docs]`
 
-Generate the api doc of the modules in `./hp`
+Generate the api doc of the modules in `./pyheatpump`
 
-`sphinx-apidoc -o docs/source/modules hp`
+`sphinx-apidoc -o docs/source/modules pyheatpump`
 
 Then build them:
 

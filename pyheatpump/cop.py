@@ -44,6 +44,18 @@ def classify_hp(T_sink_out: float,
                 parameters: Union[dict, None] = None) -> str:
     """
     Classify the heat pump based on the sink temperature (delivered temperature).
+    Regression assumptions for the heat pumps:
+        - Electric driven single-stage compression
+        - Subcritical closed-loop process
+        - Thermal output: ≥ 50 kWth
+        - Heat source: brine and water
+        - Heat sink: water
+        - Compressor: reciprocating piston, screw, scroll and turbo (no re-
+        strictions concerning open, semi-hermetic or hermetically sealed)
+        - Refrigerant: azeotrope or quasi azeotrope with negligible temper-
+        ature glide, synthetic-organic or natural
+        - No restrictions on further system design (internal heat exchanger,
+        economizer etc.)
 
     Args:
         T_sink_out (float): Outlet temperature of the sink.

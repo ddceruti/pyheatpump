@@ -1,4 +1,6 @@
-"""This example demonstrates how to calculate the efficiency of a heat pump."""
+"""This example demonstrates how to calculate the efficiency,
+the thermal power output, the electrical power input, and the cost of the heat
+pump for a geothermal heat pump."""
 
 from pyheatpump import cop
 from pyheatpump import power

@@ -1,7 +1,7 @@
 Examples
 ========
 
-Calculate COP
+Geothermal heat pump system with limited reinjection temperature
 ----------------------
 
 Python code:
